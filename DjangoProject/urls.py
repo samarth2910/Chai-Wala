@@ -19,11 +19,12 @@ from django.urls import path,include
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView  # add this import
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/',views.home,name="home"),
-    path('about/',views.about,name="about"),
+    path('', RedirectView.as_view(url='/chai/home/')),  # Redirect root URL to /chai/home/
+
     path('chai/',include('Chai.urls')),
-    path('__reload__/', include('django_browser_reload.urls')),  # For live reloading during development
+    path('__reload__/', include('django_browser_reload.urls')),
 ]+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

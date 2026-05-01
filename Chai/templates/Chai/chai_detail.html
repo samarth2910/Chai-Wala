@@ -28,23 +28,29 @@
       </p>
 
       <!-- ✅ Action Buttons -->
-      <div class="mt-6 flex gap-4">
-        <a href="{% url 'view_cart' %}"
-           class="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow transition">
-          🛒 Add to Cart
-        </a>
+      <div class="mt-6 flex gap-4 items-center">
 
+        <!-- 🛒 Add to Cart -->
+        <form method="POST" action="{% url 'add_to_cart' chai.id %}">
+          {% csrf_token %}
+          <button type="submit"
+            class="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow transition">
+            🛒 Add to Cart
+          </button>
+        </form>
+
+        <!-- ← Back -->
         <a href="{% url 'all_chai' %}"
-           class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow transition">
+           class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full text-lg shadow transition">
           ← Back
         </a>
-      </div>
-    </div>
 
+      </div>
+
+    </div>
   </div>
 </div>
 
-<!-- Optional: Customize rating component size -->
 <style>
   sl-rating::part(base) {
     font-size: 1.25rem;

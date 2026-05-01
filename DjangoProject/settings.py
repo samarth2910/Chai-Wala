@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'Chai',
     'tailwind',
     'theme', 
-    'django_browser_reload',  # For live reloading during development
+    'django_browser_reload', # For live reloading during development
+     'rest_framework', 
 ]
 
 TAILWIND_APP_NAME = 'theme'

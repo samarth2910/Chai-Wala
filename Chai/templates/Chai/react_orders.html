@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+
+<!-- React mounts here — starts empty, React fills it -->
+<div id="orders-root"></div>
+
+<!-- React from CDN — no installation needed -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<script type="text/babel">
+  const { useState, useEffect } = React;
+
+  // ── COMPONENT 1 — Single order item row ──────────────────
+  // Props = data passed in from parent, like function arguments
+  function OrderItem({ item }) {
+    return (
+      <tr className="border-b">
+        <td className="py-2 font-medium">{item.chai_name}</td>
+        <td className="py-2">{item.quantity}</td>
+        <td className="py-2">₹{item.price}</td>
+        <td className="py-2 text-right font-semibold text-green-700">
+          ₹{(item.price * item.quantity).toFixed(2)}
+        </td>
+      </tr>
+    );
+  }
+
+  // ── COMPONENT 2 — Full order card ────────────────────────
+  function OrderCard({ order }) {
+    // Format date nicely
+    const date = new Date(order.created_at).toLocaleDateString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    return (
+      <div className="bg-white rounded-xl shadow p-6 mb-6">
+        
+        {/* Order header */}
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-gray-800">Order #{order.id}</h2>
+            <p className="text-sm text-gray-500">{date}</p>
+          </div>
+          <span className="bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full">
+            ✅ Confirmed
+          </span>
+        </div>
+
+        {/* Items table */}
+        <table className="w-full text-sm text-gray-700">
+          <thead>
+            <tr className="border-b text-left text-gray-500">
+              <th className="pb-2">Item</th>
+              <th className="pb-2">Qty</th>
+              <th className="pb-2">Price</th>
+              <th className="pb-2 text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* .map() loops over items array and renders a row for each */}
+            {order.items.map((item, index) => (
+              <OrderItem key={index} item={item} />
+            ))}
+          </tbody>
+        </table>
+
+        {/* Total */}
+        <div className="text-right mt-4">
+          <p className="text-lg font-bold text-gray-800">Total: ₹{order.total}</p>
+        </div>
+
+      </div>
+    );
+  }
+
+  // ── COMPONENT 3 — Loading spinner ────────────────────────
+  function Spinner() {
+    return (
+      <div className="flex justify-center mt-20">
+        <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // ── MAIN COMPONENT — Fetches data and shows everything ───
+  function OrdersPage() {
+    // useState = stores data, re-renders when data changes
+    const [orders, setOrders]   = useState([]);     // starts as empty array
+    const [loading, setLoading] = useState(true);   // starts as loading
+    const [error, setError]     = useState(null);   // starts as no error
+
+    // useEffect = runs once when page loads (the [] at the end means "once only")
+    useEffect(() => {
+      fetch('/chai/api/orders/', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Not logged in or server error');
+          return res.json();   // convert response to JS object
+        })
+        .then(data => {
+          setOrders(data);     // save data into state → React re-renders
+          setLoading(false);   // hide spinner
+        })
+        .catch(err => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }, []);
+
+    // What to show based on state
+    if (loading) return <Spinner />;
+    
+    if (error) return (
+      <p className="text-center text-red-500 mt-10">Error: {error}</p>
+    );
+
+    return (
+      <div className="max-w-3xl mx-auto my-10 px-4">
+        <h1 className="text-3xl font-bold text-amber-800 mb-6">📦 My Orders</h1>
+
+        {orders.length === 0 ? (
+          // Show this if no orders
+          <div className="text-center text-gray-500 mt-10">
+            <p>No orders yet.</p>
+            <a href="/chai/" className="text-amber-600 underline mt-2 inline-block">
+              Browse teas →
+            </a>
+          </div>
+        ) : (
+          // Loop over orders and show a card for each
+          orders.map(order => (
+            <OrderCard key={order.id} order={order} />
+          ))
+        )}
+      </div>
+    );
+  }
+
+  // Mount React into the empty div on the page
+  const root = ReactDOM.createRoot(document.getElementById('orders-root'));
+  root.render(<OrdersPage />);
+</script>
+
+{% endblock %}
