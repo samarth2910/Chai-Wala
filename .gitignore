@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+.env
+.venv
+
+# Django
+db.sqlite3
+*.log
+local_settings.py
+
+# Media files (user uploads)
+media/
+
+# Static files (collected)
+staticfiles/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Mac
+.DS_Store
+
+# Node (just in case)
+node_modules/
